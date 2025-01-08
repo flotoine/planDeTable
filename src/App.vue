@@ -1,37 +1,50 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import demoNameListJson from './assets/demo/demoNameList.json';
 
-  const nameList = ref([])
-  const name = ref("")
-  const numberOfTables = ref(0);
-  const chairsPerTable = ref(0)
+const nameList = ref([])
+const name = ref("")
+const numberOfTables = ref(0);
+const chairsPerTable = ref(0)
 
-  const invalidName = ref(false)
+const invalidName = ref(false)
 
-  demoNameList()
-  function demoNameList () {
-    nameList.value = demoNameListJson
+demoNameList()
+function demoNameList () {
+  nameList.value = demoNameListJson
+}
+
+function deleteAll() {
+  nameList.value = []
+}
+
+function addName () {
+  const nameRegex = /^[a-zA-ZÀ-Ÿ-]{2,20}$/;
+
+  if (nameRegex.test(name.value)&&!nameList.value.some(item => item.name === name.value)) { // checks sets of characters and if name already in list
+    invalidName.value = false
+    nameList.value.push({"name": name.value, "table": 0})
+  } else {
+    invalidName.value = true
   }
+}
 
-  function deleteAll() {
-    nameList.value = []
-  }
-  
-  function addName () {
-    const nameRegex = /^[a-zA-ZÀ-Ÿ-]{2,20}$/;
+function deleteName (name) {
+  nameList.value = nameList.value.filter((nameToSearch) => name !== nameToSearch);
+}
 
-    if (nameRegex.test(name.value)&&!nameList.value.some(item => item.name === name.value)) { // checks sets of characters and if name already in list
-      invalidName.value = false
-      nameList.value.push({"name": name.value, "table": 0})
-    } else {
-      invalidName.value = true
-    }
-  }
+watch(numberOfTables, (newNumberOfTables) => {
+dispatchInTables ()
+})
 
-  function deleteName (name) {
-    nameList.value = nameList.value.filter((nameToSearch) => name !== nameToSearch);
+function dispatchInTables () {
+  let counter = 1;
+  for (let i = 0 ; i < nameList.value.length; i++) {
+    nameList.value[i].table = counter;
+    counter ++;
+    if (counter > numberOfTables.value) { counter = 1 }
   }
+}
 
 </script>
 
@@ -46,9 +59,7 @@ import demoNameListJson from './assets/demo/demoNameList.json';
       <h2>Organiser les tables</h2>
       <label for="name">Nombre de tables : </label>
       <input v-model="numberOfTables" name="numberOfTables" type="number" min="1" max="100"/>
-      <label for="name">Chaises par tables : </label>
-      <input v-model="chairsPerTable" name="chairsPerTable" type="number" min="1" max="100"/>
-      <p>Contrôle : il y a {{ numberOfTables }} tables de {{ chairsPerTable }} chaises</p>
+      <p>Contrôle : il y a {{ numberOfTables }} tables</p>
     </div>
     <div>
       <h2>Ajouter un.e invité.e</h2>
@@ -59,8 +70,8 @@ import demoNameListJson from './assets/demo/demoNameList.json';
     </div>
     <br>
     <div class="list">
-      <div class="list_name" @click="deleteName(name)" v-for="name in nameList" :key="name.id">
-        {{ name.name }}
+      <div class="list_name" @click="deleteName(item)" v-for="item in nameList" :key="item.id">
+        {{ item.name }} dans la table {{ item.table }}
       </div>
     </div>
   </div>
