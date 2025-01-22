@@ -41,24 +41,23 @@ watch(numberOfTables, (newNumberOfTables) => {
   <div>
     <h1>Le plan de table</h1>
     <div>
-      <button @click="demoButtonHandler">Démo</button>
-      <button @click="deleteAllButtonHandler">Tout effacer</button>
-    </div>
-    <div>
       <h2>Organiser les tables</h2>
       <label for="name">Nombre de tables : </label>
       <input v-model="numberOfTables" name="numberOfTables" type="number" min="1" max="100"/>
       <p v-if="numberOfTables<=1">Contrôle : il y a {{ numberOfTables }} table</p> 
       <p v-else>Contrôle : il y a {{ numberOfTables }} tables</p> 
     </div>
-    <div>
+    <div class="add-guest-card">
       <h2>Ajouter un.e invité.e</h2>
-      <label for="name">Nom : </label>
-      <input v-model="name" name="name" type="text" placeholder="Michel" />
-      <button @click="addNameButtonHandler">Ajouter</button>
+      <form class="add-guest-form">
+        <label for="name">Nom :</label>
+        <input v-model="name" name="name" type="text" placeholder="Michel" />
+        <button @click.prevent="addNameButtonHandler">Ajouter</button>
+        <button @click.prevent="demoButtonHandler">Démo</button>
+        <button @click.prevent="deleteAllButtonHandler">Tout effacer</button>
+      </form>
       <p v-if="invalidName">Le nom rentré est invalide ou déjà dans la liste</p>
     </div>
-    <br>
     <div class="list">
       <div class="list_name" @click="deleteNameButtonHandler(item,nameList)" v-for="item in nameList" :key="item.id">
         {{ item.name }} dans la table {{ item.table }}
@@ -68,6 +67,22 @@ watch(numberOfTables, (newNumberOfTables) => {
 </template>
 
 <style scoped>
+  .add-guest-card {
+    padding: 0 0 2% 0;
+  }
+
+  .add-guest-form {
+    display: flex;
+    justify-content: center;
+    gap: 2%;
+  }
+
+  .add-guest-form > * {
+    flex-shrink: 0;
+    height: 50px;
+    align-content: center;
+  }
+
   .list {
     display: flex;
     flex-wrap: wrap;
@@ -78,5 +93,6 @@ watch(numberOfTables, (newNumberOfTables) => {
     padding: 2px;
     border: solid 1px;
   }
+
 
 </style>
