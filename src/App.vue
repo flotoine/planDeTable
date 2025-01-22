@@ -1,37 +1,34 @@
 <script setup>
 import { ref, watch } from 'vue';
-import demoNameListJson from './assets/demo/demoNameList.json';
+
+import { API } from './services';
 
 const nameList = ref([])
 const name = ref("")
 const numberOfTables = ref(0);
-const chairsPerTable = ref(0)
-
 const invalidName = ref(false)
 
-demoNameList()
-function demoNameList () {
-  nameList.value = demoNameListJson
+
+
+/////////////////////////// NAME API BUTTON HANDLERS
+
+const deleteAllButtonHandler = () => {
+  API.name.deleteAllNames(nameList)
 }
 
-function deleteAll() {
-  nameList.value = []
+const addNameButtonHandler = () => {
+  API.name.addName(name,invalidName,nameList)
 }
 
-function addName () {
-  const nameRegex = /^[a-zA-ZÀ-Ÿ-]{2,20}$/;
-
-  if (nameRegex.test(name.value)&&!nameList.value.some(item => item.name === name.value)) { // checks sets of characters and if name already in list
-    invalidName.value = false
-    nameList.value.push({"name": name.value, "table": 0})
-  } else {
-    invalidName.value = true
-  }
+const deleteNameButtonHandler = (item) => {
+  API.name.deleteName(item,nameList)
 }
 
-function deleteName (name) {
-  nameList.value = nameList.value.filter((nameToSearch) => name !== nameToSearch);
+const demoButtonHandler = () => {
+  API.name.useDemoNameList(nameList)
 }
+
+/////////////////////////////
 
 watch(numberOfTables, (newNumberOfTables) => {
 dispatchInTables ()
@@ -52,8 +49,8 @@ function dispatchInTables () {
   <div>
     <h1>Le plan de table</h1>
     <div>
-      <button @click="demoNameList">Démo</button>
-      <button @click="deleteAll">Tout effacer</button>
+      <button @click="demoButtonHandler">Démo</button>
+      <button @click="deleteAllButtonHandler">Tout effacer</button>
     </div>
     <div>
       <h2>Organiser les tables</h2>
@@ -65,12 +62,12 @@ function dispatchInTables () {
       <h2>Ajouter un.e invité.e</h2>
       <label for="name">Nom : </label>
       <input v-model="name" name="name" type="text" placeholder="Michel" />
-      <button @click="addName">Ajouter</button>
+      <button @click="addNameButtonHandler">Ajouter</button>
       <p v-if="invalidName">Le nom rentré est invalide ou déjà dans la liste</p>
     </div>
     <br>
     <div class="list">
-      <div class="list_name" @click="deleteName(item)" v-for="item in nameList" :key="item.id">
+      <div class="list_name" @click="deleteNameButtonHandler(item,nameList)" v-for="item in nameList" :key="item.id">
         {{ item.name }} dans la table {{ item.table }}
       </div>
     </div>
