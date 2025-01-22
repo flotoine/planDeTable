@@ -1,12 +1,12 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { API } from './services';
 
-const nameList = ref([])
-const name = ref("")
+const nameList = ref([])  /// contains all guest names & their table number
+const name = ref("")  /// contains guest name to enter
 const numberOfTables = ref(0);
-const invalidName = ref(false)
+const invalidName = ref(false)   /// regex controlled
 
 
 
@@ -31,17 +31,9 @@ const demoButtonHandler = () => {
 /////////////////////////////
 
 watch(numberOfTables, (newNumberOfTables) => {
-dispatchInTables ()
+  API.table.dispatchInTables(nameList,numberOfTables)
 })
 
-function dispatchInTables () {
-  let counter = 1;
-  for (let i = 0 ; i < nameList.value.length; i++) {
-    nameList.value[i].table = counter;
-    counter ++;
-    if (counter > numberOfTables.value) { counter = 1 }
-  }
-}
 
 </script>
 
@@ -56,7 +48,8 @@ function dispatchInTables () {
       <h2>Organiser les tables</h2>
       <label for="name">Nombre de tables : </label>
       <input v-model="numberOfTables" name="numberOfTables" type="number" min="1" max="100"/>
-      <p>Contrôle : il y a {{ numberOfTables }} tables</p>
+      <p v-if="numberOfTables<=1">Contrôle : il y a {{ numberOfTables }} table</p> 
+      <p v-else>Contrôle : il y a {{ numberOfTables }} tables</p> 
     </div>
     <div>
       <h2>Ajouter un.e invité.e</h2>
